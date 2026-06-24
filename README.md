@@ -2,3 +2,5 @@
 ```bash
 python manage.py loaddata news.json
 ```
+
+исходная версия имеет соответствующий коммент
