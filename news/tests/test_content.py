@@ -11,6 +11,9 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 
 from news.models import Comment, News
+# Импортируем класс формы.
+from news.forms import CommentForm
+
 
 User = get_user_model()
 
@@ -153,3 +156,28 @@ class TestDetailPage(TestCase):
 
         # Проверяем, что временные метки отсортированы правильно.
         self.assertEqual(all_timestamps, sorted_timestamps)
+
+    #
+    def test_anonymous_client_has_no_form(self):
+        """Тест проверяет.
+
+        Что при запросе анонимного пользователя форма
+        не передаётся в словаре контекста.
+        """
+        response = self.client.get(self.detail_url)
+        self.assertNotIn('form', response.context)
+
+    #
+    def test_authorized_client_has_form(self):
+        """Тест проверяет.
+
+        Что при запросе авторизованного пользователя
+        форма передаётся в словаре.
+        """
+        # Авторизуем клиент при помощи ранее созданного пользователя.
+        self.client.force_login(self.author)
+        response = self.client.get(self.detail_url)
+        self.assertIn('form', response.context)
+
+        # Проверим, что объект формы соответствует нужному классу формы.
+        self.assertIsInstance(response.context['form'], CommentForm)
